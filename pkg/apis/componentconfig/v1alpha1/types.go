@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/kubernetes/pkg/api/v1"
 )
 
@@ -130,6 +131,7 @@ type KubeSchedulerConfiguration struct {
 	FailureDomains string `json:"failureDomains"`
 	// leaderElection defines the configuration of leader election client.
 	LeaderElection LeaderElectionConfiguration `json:"leaderElection"`
+	HostPortRange  utilnet.PortRange           `json:hostPortRange`
 }
 
 // HairpinMode denotes how the kubelet should configure networking to handle

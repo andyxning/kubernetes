@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/kubernetes/pkg/api"
 )
 
@@ -596,6 +597,7 @@ type KubeSchedulerConfiguration struct {
 	FailureDomains string
 	// leaderElection defines the configuration of leader election client.
 	LeaderElection LeaderElectionConfiguration
+	HostPortRange  utilnet.PortRange
 }
 
 // LeaderElectionConfiguration defines the configuration of leader election

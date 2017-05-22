@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/client-go/tools/cache"
+	utilpod "k8s.io/kubernetes/pkg/api/pod"
 	"k8s.io/kubernetes/pkg/api/v1"
 	"k8s.io/kubernetes/pkg/client/clientset_generated/clientset"
 	appsinformers "k8s.io/kubernetes/pkg/client/informers/informers_generated/externalversions/apps/v1beta1"
@@ -379,6 +380,7 @@ func (f *ConfigFactory) CreateFromKeys(predicateKeys, priorityKeys sets.String, 
 		Algorithm:           algo,
 		Binder:              &binder{f.client},
 		PodConditionUpdater: &podConditionUpdater{f.client},
+		PodUpdater:          &podUpdater{f.client},
 		NextPod: func() *v1.Pod {
 			return f.getNextPod()
 		},
@@ -457,11 +459,26 @@ func (f *ConfigFactory) Run() {
 func (f *ConfigFactory) getNextPod() *v1.Pod {
 	for {
 		pod := cache.Pop(f.podQueue).(*v1.Pod)
-		if f.ResponsibleForPod(pod) {
+		if isAllowSchedule(pod) && f.ResponsibleForPod(pod) {
 			glog.V(4).Infof("About to try and schedule pod %v", pod.Name)
 			return pod
 		}
 	}
+}
+
+func isAllowSchedule(pod *v1.Pod) bool {
+	_, autoport := pod.ObjectMeta.Annotations[utilpod.PodAutoPortAnnotation]
+	if !autoport {
+		return true
+	}
+	for i := range pod.Spec.Containers {
+		for j := range pod.Spec.Containers[i].Ports {
+			if pod.Spec.Containers[i].Ports[j].HostPort != 0 {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (f *ConfigFactory) ResponsibleForPod(pod *v1.Pod) bool {
@@ -590,6 +607,20 @@ func (b *binder) Bind(binding *v1.Binding) error {
 
 type podConditionUpdater struct {
 	Client clientset.Interface
+}
+
+type podUpdater struct {
+	Client clientset.Interface
+}
+
+func (p *podUpdater) Update(pod *v1.Pod) error {
+	glog.V(2).Infof("Updating pod %s/%s", pod.Namespace, pod.Name)
+	_, autoport := pod.ObjectMeta.Annotations[utilpod.PodAutoPortAnnotation]
+	if !autoport {
+		return nil
+	}
+	_, err := p.Client.Core().Pods(pod.Namespace).Update(pod)
+	return err
 }
 
 func (p *podConditionUpdater) Update(pod *v1.Pod, condition *v1.PodCondition) error {

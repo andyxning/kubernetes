@@ -105,6 +105,7 @@ func createScheduler(
 
 	return scheduler.NewFromConfigurator(configurator, func(cfg *scheduler.Config) {
 		cfg.Recorder = recorder
+		cfg.HostPortRange = s.HostPortRange
 	})
 }
 
