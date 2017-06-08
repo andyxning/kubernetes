@@ -184,6 +184,7 @@ type HostInterface interface {
 	ImagesFsInfo() (cadvisorapiv2.FsInfo, error)
 	RootFsInfo() (cadvisorapiv2.FsInfo, error)
 	ListVolumesForPod(podUID types.UID) (map[string]volume.Volume, bool)
+        PLEGHealthCheck() error
 	GetExec(podFullName string, podUID types.UID, containerName string, cmd []string, streamOpts remotecommand.Options) (*url.URL, error)
 	GetAttach(podFullName string, podUID types.UID, containerName string, streamOpts remotecommand.Options) (*url.URL, error)
 	GetPortForward(podName, podNamespace string, podUID types.UID, portForwardOpts portforward.V4Options) (*url.URL, error)
@@ -261,6 +262,7 @@ func (s *Server) InstallAuthFilter() {
 func (s *Server) InstallDefaultHandlers() {
 	healthz.InstallHandler(s.restfulCont,
 		healthz.PingHealthz,
+                healthz.NamedCheck("PLEG", s.plegHealthCheck),
 		healthz.NamedCheck("syncloop", s.syncLoopHealthCheck),
 	)
 	var ws *restful.WebService
@@ -428,6 +430,11 @@ func (s *Server) syncLoopHealthCheck(req *http.Request) error {
 		return fmt.Errorf("Sync Loop took longer than expected.")
 	}
 	return nil
+}
+
+// Checks if pleg, which lists pods periodically, is healthy.
+func (s *Server) plegHealthCheck(req *http.Request) error {
+	return s.host.PLEGHealthCheck()
 }
 
 // getContainerLogs handles containerLogs request against the Kubelet
