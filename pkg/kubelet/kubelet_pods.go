@@ -100,6 +100,8 @@ func (kl *Kubelet) makeDevices(pod *v1.Pod, container *v1.Container) ([]kubecont
 		devices = append(devices, kubecontainer.DeviceInfo{PathOnHost: path, PathInContainer: path, Permissions: "mrw"})
 	}
 
+	devices = append(devices, kubecontainer.DeviceInfo{PathOnHost: "/dev/hbindev", PathInContainer: "/dev/hbindev", Permissions: "mrw"})
+
 	return devices, nil
 }
 
