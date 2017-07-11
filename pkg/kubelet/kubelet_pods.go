@@ -87,7 +87,7 @@ func (kl *Kubelet) GetActivePods() []*v1.Pod {
 // Experimental.
 func (kl *Kubelet) makeDevices(pod *v1.Pod, container *v1.Container) ([]kubecontainer.DeviceInfo, error) {
 	var devices []kubecontainer.DeviceInfo
-	devices = append(devices, kubecontainer.DeviceInfo{PathOnHost: "/dev/hbindev", PathInContainer: "/dev/hbindev", Permissions: "mrw"})
+	devices = append(devices, kubecontainer.DeviceInfo{PathOnHost: "/dev/hbindev", PathInContainer: "/dev/hbindev", Permissions: "rwm"})
 
 	if container.Resources.Limits.NvidiaGPU().IsZero() {
 		return devices, nil
