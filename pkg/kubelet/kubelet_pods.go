@@ -90,6 +90,7 @@ func (kl *Kubelet) makeDevices(pod *v1.Pod, container *v1.Container) ([]kubecont
 	for _, envVar := range container.Env {
 		if envVar.Name == "TCE_HOST_FRAMEWORK" {
 			devices = append(devices, kubecontainer.DeviceInfo{PathOnHost: "/dev/hbindev", PathInContainer: "/dev/hbindev", Permissions: "rwm"})
+			break
 		}
 	}
 	if container.Resources.Limits.NvidiaGPU().IsZero() {
