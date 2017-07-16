@@ -78,6 +78,11 @@ func (pb *prober) probe(probeType probeType, pod *v1.Pod, status v1.PodStatus, c
 	switch probeType {
 	case readiness:
 		probeSpec = container.ReadinessProbe
+		for _, condition := range status.Conditions {
+			if condition.Type == v1.PodReady && condition.Status == v1.ConditionTrue {
+				return results.Success, nil
+			}
+		}
 	case liveness:
 		probeSpec = container.LivenessProbe
 	default:
