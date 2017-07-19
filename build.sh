@@ -2,4 +2,4 @@
 
 # For scm repo
 make
-mv _output output
+mv _output/local/go/bin output
