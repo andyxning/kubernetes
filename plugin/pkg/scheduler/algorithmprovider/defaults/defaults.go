@@ -200,6 +200,7 @@ func defaultPriorities() sets.String {
 
 		// Prioritize nodes by least requested utilization.
 		factory.RegisterPriorityFunction2("LeastRequestedPriority", priorities.LeastRequestedPriorityMap, nil, 1),
+		factory.RegisterPriorityFunction2("MostGPURequestedPriority", priorities.MostGPURequestedPriorityMap, nil, 10000),
 
 		// Prioritizes nodes to help achieve balanced resource usage
 		factory.RegisterPriorityFunction2("BalancedResourceAllocation", priorities.BalancedResourceAllocationMap, nil, 1),
