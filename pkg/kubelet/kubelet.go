@@ -62,6 +62,8 @@ import (
 	"k8s.io/kubernetes/pkg/kubelet/cm"
 	"k8s.io/kubernetes/pkg/kubelet/config"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
+	"k8s.io/kubernetes/pkg/kubelet/cpuset"
+	"k8s.io/kubernetes/pkg/kubelet/cpuset/docker"
 	"k8s.io/kubernetes/pkg/kubelet/dockershim"
 	dockerremote "k8s.io/kubernetes/pkg/kubelet/dockershim/remote"
 	"k8s.io/kubernetes/pkg/kubelet/dockertools"
@@ -813,6 +815,20 @@ func NewMainKubelet(kubeCfg *componentconfig.KubeletConfiguration, kubeDeps *Kub
 	if klet.gpuManager == nil {
 		klet.gpuManager = gpu.NewGPUManagerStub()
 	}
+
+	if utilfeature.DefaultFeatureGate.Enabled(features.CpuSet) {
+		if kubeCfg.ContainerRuntime == "docker" {
+			if klet.cpuSetManager, err = docker.NewCpuSetManager(klet, machineInfo, klet.dockerClient); err != nil {
+				return nil, err
+			}
+		} else {
+			glog.Errorf("CpuSet feature is supported with docker runtime only. Disabling this feature internally.")
+		}
+	}
+	// Set GPU manager to a stub implementation if it is not enabled or cannot be supported.
+	if klet.cpuSetManager == nil {
+		klet.cpuSetManager = cpuset.NewCpuSetManagerStub()
+	}
 	// Finally, put the most recent version of the config on the Kubelet, so
 	// people can see how it was configured.
 	klet.kubeletConfiguration = *kubeCfg
@@ -1116,6 +1132,8 @@ type Kubelet struct {
 	// GPU Manager
 	gpuManager gpu.GPUManager
 
+	cpuSetManager cpuset.CpuSetManager
+
 	// dockerLegacyService contains some legacy methods for backward compatibility.
 	// It should be set only when docker is using non json-file logging driver.
 	dockerLegacyService dockershim.DockerLegacyService
@@ -1215,6 +1233,7 @@ func (kl *Kubelet) initializeModules() error {
 	// Step 7: Initialize GPUs
 	kl.gpuManager.Start()
 
+	kl.cpuSetManager.Start()
 	// Step 8: Start resource analyzer
 	kl.resourceAnalyzer.Start()
 

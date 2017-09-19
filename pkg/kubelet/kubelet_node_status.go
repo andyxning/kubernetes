@@ -489,6 +489,13 @@ func (kl *Kubelet) setNodeStatusMachineInfo(node *v1.Node) {
 		}
 	}
 
+	numaCapacity := kl.cpuSetManager.CapacityNuma()
+	if numaCapacity != nil {
+		for k, v := range numaCapacity {
+			node.Status.Capacity[k] = v
+		}
+	}
+
 	// TODO: Post NotReady if we cannot get MachineInfo from cAdvisor. This needs to start
 	// cAdvisor locally, e.g. for test-cmd.sh, and in integration test.
 	info, err := kl.GetCachedMachineInfo()

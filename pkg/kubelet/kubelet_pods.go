@@ -109,6 +109,17 @@ func (kl *Kubelet) makeDevices(pod *v1.Pod, container *v1.Container) ([]kubecont
 	return devices, nil
 }
 
+func (kl *Kubelet) makeNumas(pod *v1.Pod, container *v1.Container) (string, error) {
+	if container.Resources.Limits.Numa().IsZero() {
+		return "", nil
+	}
+	numas, err := kl.cpuSetManager.AllocateNuma(pod, container)
+	if err != nil {
+		return "", err
+	}
+	return strings.Join(numas, ","), nil
+}
+
 // makeMounts determines the mount points for the given container.
 func makeMounts(pod *v1.Pod, podDir string, container *v1.Container, hostName, hostDomain, podIP string, podVolumes kubecontainer.VolumeMap) ([]kubecontainer.Mount, error) {
 	// Kubernetes only mounts on /etc/hosts if :
@@ -318,6 +329,10 @@ func (kl *Kubelet) GenerateRunContainerOptions(pod *v1.Pod, container *v1.Contai
 	opts.PortMappings = kubecontainer.MakePortMappings(container)
 	// TODO(random-liu): Move following convert functions into pkg/kubelet/container
 	opts.Devices, err = kl.makeDevices(pod, container)
+	if err != nil {
+		return nil, false, err
+	}
+	opts.CpusetMems, err = kl.makeNumas(pod, container)
 	if err != nil {
 		return nil, false, err
 	}

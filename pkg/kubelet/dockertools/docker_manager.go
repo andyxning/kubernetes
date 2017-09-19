@@ -684,6 +684,7 @@ func (dm *DockerManager) runContainer(
 			CgroupPermissions: device.Permissions,
 		}
 	}
+	cpusetMems := opts.CpusetMems
 	binds := makeMountBindings(opts.Mounts)
 
 	// The reason we create and mount the log file in here (not in kubelet) is because
@@ -740,6 +741,7 @@ func (dm *DockerManager) runContainer(
 			MemorySwap: -1,
 			CPUShares:  cpuShares,
 			Devices:    devices,
+			CpusetMems: cpusetMems,
 		},
 		SecurityOpt: fmtSecurityOpts,
 	}
