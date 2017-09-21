@@ -18,6 +18,7 @@ package docker
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -68,7 +69,7 @@ func NewCpuSetManager(activePodsLister activePodsLister, machineInfo *cadvisorap
 func (csm *cpusetManager) discover() {
 	machineInfo := csm.machineInfo
 	for _, socket := range machineInfo.Topology {
-		csm.allNumaSets.Insert(string(socket.Id))
+		csm.allNumaSets.Insert(strconv.Itoa(socket.Id))
 		for _, core := range socket.Cores {
 			for _, cpu := range core.Threads {
 				csm.cpuDetails[cpu] = CPUInfo{
