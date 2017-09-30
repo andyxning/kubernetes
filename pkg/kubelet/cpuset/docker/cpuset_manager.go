@@ -93,7 +93,7 @@ func (csm *cpusetManager) Start() error {
 	csm.discover()
 
 	csm.allocatedNuma = csm.numasInUse()
-	csm.AllocateCpu = csm.cpusInUse()
+	csm.allocatedCpu = csm.cpusInUse()
 	return nil
 }
 
