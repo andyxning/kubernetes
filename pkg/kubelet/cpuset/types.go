@@ -29,4 +29,8 @@ type CpuSetManager interface {
 	// Returns paths to allocated GPUs and nil on success.
 	// Returns an error on failure.
 	AllocateNuma(*v1.Pod, *v1.Container) ([]string, error)
+	// AllocateCpu attempts to allocate cpu for input container.
+	// Returns paths to allocated GPUs and nil on success.
+	// Returns an error on failure.
+	AllocateCpu(*v1.Pod, *v1.Container) ([]string, error)
 }

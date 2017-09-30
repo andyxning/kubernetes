@@ -33,7 +33,11 @@ func (cms *cpuSetManagerStub) CapacityNuma() v1.ResourceList {
 }
 
 func (cms *cpuSetManagerStub) AllocateNuma(_ *v1.Pod, _ *v1.Container) ([]string, error) {
-	return nil, fmt.Errorf("GPUs are not supported")
+	return nil, fmt.Errorf("Numas are not supported")
+}
+
+func (cms *cpuSetManagerStub) AllocateCpu(_ *v1.Pod, _ *v1.Container) ([]string, error) {
+	return nil, fmt.Errorf("Cpusets are not supported")
 }
 
 func NewCpuSetManagerStub() CpuSetManager {

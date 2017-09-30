@@ -436,6 +436,7 @@ type RunContainerOptions struct {
 	// hostname for pod containers
 	Hostname   string
 	CpusetMems string
+	CpusetCpus string
 	// EnableHostUserNamespace sets userns=host when users request host namespaces (pid, ipc, net),
 	// are using non-namespaced capabilities (mknod, sys_time, sys_module), the pod contains a privileged container,
 	// or using host path volumes.

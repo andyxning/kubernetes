@@ -174,6 +174,7 @@ func (m *kubeGenericRuntimeManager) generateContainerConfig(container *v1.Contai
 	}
 
 	config.Linux.Resources.CpusetMems = opts.CpusetMems
+	config.Linux.Resources.CpusetCpus = opts.CpusetCpus
 
 	// set environment variables
 	envs := make([]*runtimeapi.KeyValue, len(opts.Envs))

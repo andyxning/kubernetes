@@ -150,13 +150,22 @@ func (ds *dockerService) CreateContainer(podSandboxID string, config *runtimeapi
 		// TODO: Can we assume the defaults are sane?
 		rOpts := lc.GetResources()
 		if rOpts != nil {
-			hc.Resources = dockercontainer.Resources{
-				Memory:     rOpts.MemoryLimitInBytes,
-				MemorySwap: dockertools.DefaultMemorySwap(),
-				CPUShares:  rOpts.CpuShares,
-				CPUQuota:   rOpts.CpuQuota,
-				CPUPeriod:  rOpts.CpuPeriod,
-				CpusetMems: rOpts.CpusetMems,
+			if rOpts.CpusetCpus != "" {
+				hc.Resources = dockercontainer.Resources{
+					Memory:     rOpts.MemoryLimitInBytes,
+					MemorySwap: dockertools.DefaultMemorySwap(),
+					CPUPeriod:  rOpts.CpuPeriod,
+					CpusetCpus: rOpts.CpusetCpus,
+				}
+			} else {
+				hc.Resources = dockercontainer.Resources{
+					Memory:     rOpts.MemoryLimitInBytes,
+					MemorySwap: dockertools.DefaultMemorySwap(),
+					CPUShares:  rOpts.CpuShares,
+					CPUQuota:   rOpts.CpuQuota,
+					CPUPeriod:  rOpts.CpuPeriod,
+					CpusetMems: rOpts.CpusetMems,
+				}
 			}
 			hc.OomScoreAdj = int(rOpts.OomScoreAdj)
 		}
