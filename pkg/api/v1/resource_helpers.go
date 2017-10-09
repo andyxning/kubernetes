@@ -66,7 +66,7 @@ func (self *ResourceList) Numa() *resource.Quantity {
 }
 
 func (self *ResourceList) CpuSet() *resource.Quantity {
-	if val, ok := (*self)[ResourceNuma]; ok {
+	if val, ok := (*self)[ResourceCpuSet]; ok {
 		return &val
 	}
 	return &resource.Quantity{}
