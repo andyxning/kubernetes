@@ -121,7 +121,7 @@ func (kl *Kubelet) makeNumas(pod *v1.Pod, container *v1.Container) (string, erro
 }
 
 func (kl *Kubelet) makeCpus(pod *v1.Pod, container *v1.Container) (string, error) {
-	if container.Resources.Limits.Cpu().IsZero() {
+	if container.Resources.Limits.CpuSet().IsZero() {
 		return "", nil
 	}
 	cpus, err := kl.cpuSetManager.AllocateCpu(pod, container)

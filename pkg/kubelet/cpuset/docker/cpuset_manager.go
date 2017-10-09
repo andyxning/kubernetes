@@ -104,6 +104,13 @@ func (csm *cpusetManager) CapacityNuma() v1.ResourceList {
 	}
 }
 
+func (csm *cpusetManager) CapacityCpuSet() v1.ResourceList {
+	cpusets := resource.NewQuantity(int64(len(csm.allCpuSets)), resource.DecimalSI)
+	return v1.ResourceList{
+		v1.ResourceCpuSet: *cpusets,
+	}
+}
+
 func (csm *cpusetManager) AllocateCpu(pod *v1.Pod, container *v1.Container) ([]string, error) {
 	cpusNeeded := container.Resources.Limits.Cpu().Value()
 	if cpusNeeded == 0 {
@@ -261,7 +268,7 @@ func (csm *cpusetManager) cpusInUse() *podCpuSets {
 	for _, pod := range pods {
 		containers := sets.NewString()
 		for _, container := range pod.Spec.Containers {
-			if !container.Resources.Limits.Cpu().IsZero() {
+			if !container.Resources.Limits.CpuSet().IsZero() {
 				containers.Insert(container.Name)
 			}
 		}

@@ -3348,8 +3348,10 @@ const (
 	ResourceStorage ResourceName = "storage"
 	// NVIDIA GPU, in devices. Alpha, might change: although fractional and allowing values >1, only one whole device per node is assigned.
 	ResourceNvidiaGPU ResourceName = "alpha.kubernetes.io/nvidia-gpu"
-	// Number of Pods that may be running on this Node: see ResourcePods
+	// Number of numas
 	ResourceNuma ResourceName = "pod.alpha.kubernetes.io/opaque-int-resource-numa"
+	// Number of cpusets
+	ResourceCpuSet ResourceName = "pod.alpha.kubernetes.io/opaque-int-resource-cpuset"
 )
 
 const (

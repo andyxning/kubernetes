@@ -32,6 +32,10 @@ func (cms *cpuSetManagerStub) CapacityNuma() v1.ResourceList {
 	return nil
 }
 
+func (cms *cpuSetManagerStub) CapacityCpuSet() v1.ResourceList {
+	return nil
+}
+
 func (cms *cpuSetManagerStub) AllocateNuma(_ *v1.Pod, _ *v1.Container) ([]string, error) {
 	return nil, fmt.Errorf("Numas are not supported")
 }
