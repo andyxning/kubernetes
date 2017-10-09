@@ -43,13 +43,13 @@ type ByCore struct {
 	cpuDetails CPUDetails
 }
 
-func (cpuset ByCore) Len() int { return len(cpuset.threads) }
+func (cpuset *ByCore) Len() int { return len(cpuset.threads) }
 
-func (cpuset ByCore) Swap(i, j int) {
+func (cpuset *ByCore) Swap(i, j int) {
 	cpuset.threads[i], cpuset.threads[j] = cpuset.threads[j], cpuset.threads[i]
 }
 
-func (cpuset ByCore) Less(i, j int) bool {
+func (cpuset *ByCore) Less(i, j int) bool {
 	threadi, _ := strconv.Atoi(cpuset.threads[i])
 	threadj, _ := strconv.Atoi(cpuset.threads[j])
 	return cpuset.cpuDetails[threadi].SocketID*100+cpuset.cpuDetails[threadi].CoreID < cpuset.cpuDetails[threadj].SocketID*100+cpuset.cpuDetails[threadj].CoreID
@@ -155,7 +155,7 @@ func (csm *cpusetManager) AllocateCpu(pod *v1.Pod, container *v1.Container) ([]s
 	if int64(available.Len()) < cpusNeeded {
 		return []string{}, fmt.Errorf("requested number of cpus unavailable. Requested: %d, Available: %d", cpusNeeded, available.Len())
 	}
-	bycore := ByCore{
+	bycore := &ByCore{
 		threads:    available.UnsortedList(),
 		cpuDetails: csm.cpuDetails,
 	}
