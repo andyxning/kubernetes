@@ -112,7 +112,7 @@ func (csm *cpusetManager) CapacityCpuSet() v1.ResourceList {
 }
 
 func (csm *cpusetManager) AllocateCpu(pod *v1.Pod, container *v1.Container) ([]string, error) {
-	cpusNeeded := container.Resources.Limits.Cpu().Value()
+	cpusNeeded := container.Resources.Limits.CpuSet().Value()
 	if cpusNeeded == 0 {
 		return []string{}, nil
 	}
