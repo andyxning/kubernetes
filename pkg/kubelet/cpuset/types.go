@@ -26,7 +26,7 @@ type CpuSetManager interface {
 	// Capacity returns the total number of numas on the node.
 	CapacityNuma() v1.ResourceList
 	// Capacity returns the total number of cpusets on the node.
-	CapacityCpuset() v1.ResourceList
+	CapacityCpuSet() v1.ResourceList
 	// AllocateMem attempts to allocate numa for input container.
 	// Returns paths to allocated GPUs and nil on success.
 	// Returns an error on failure.

@@ -496,7 +496,7 @@ func (kl *Kubelet) setNodeStatusMachineInfo(node *v1.Node) {
 		}
 	}
 
-	cpusetCapacity := kl.cpuSetManager.CapacityCpuset()
+	cpusetCapacity := kl.cpuSetManager.CapacityCpuSet()
 	if cpusetCapacity != nil {
 		for k, v := range cpusetCapacity {
 			node.Status.Capacity[k] = v
