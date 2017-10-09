@@ -18,6 +18,7 @@ package docker
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -35,6 +36,23 @@ import (
 type activePodsLister interface {
 	// Returns a list of active pods on the node.
 	GetActivePods() []*v1.Pod
+}
+
+type ByCore struct {
+	threads    []string
+	cpuDetails CPUDetails
+}
+
+func (cpuset ByCore) Len() int { return len(cpuset.threads) }
+
+func (cpuset ByCore) Swap(i, j int) {
+	cpuset.threads[i], cpuset.threads[j] = cpuset.threads[j], cpuset.threads[i]
+}
+
+func (cpuset ByCore) Less(i, j int) bool {
+	threadi, _ := strconv.Atoi(cpuset.threads[i])
+	threadj, _ := strconv.Atoi(cpuset.threads[j])
+	return cpuset.cpuDetails[threadi].SocketID*100+cpuset.cpuDetails[threadi].CoreID < cpuset.cpuDetails[threadj].SocketID*100+cpuset.cpuDetails[threadj].CoreID
 }
 
 type cpusetManager struct {
@@ -137,7 +155,13 @@ func (csm *cpusetManager) AllocateCpu(pod *v1.Pod, container *v1.Container) ([]s
 	if int64(available.Len()) < cpusNeeded {
 		return []string{}, fmt.Errorf("requested number of cpus unavailable. Requested: %d, Available: %d", cpusNeeded, available.Len())
 	}
-	ret := available.UnsortedList()[:cpusNeeded]
+	bycore := ByCore{
+		threads:    available.UnsortedList(),
+		cpuDetails: csm.cpuDetails,
+	}
+	sort.Sort(bycore)
+	ret := bycore.threads[:cpusNeeded]
+	glog.V(4).Info("available cpu========%v, cpuDetails====%v", ret, csm.cpuDetails)
 	for _, cpu := range ret {
 		csm.allocatedCpu.insert(string(pod.UID), container.Name, cpu)
 	}
