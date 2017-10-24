@@ -82,6 +82,7 @@ const (
 	// Works only with Docker Container Runtime.
 	Accelerators utilfeature.Feature = "Accelerators"
 
+	CpuSet utilfeature.Feature = "CpuSet"
 	// owner: @gmarek
 	// alpha: v1.6
 	//
@@ -106,6 +107,7 @@ var defaultKubernetesFeatureGates = map[utilfeature.Feature]utilfeature.FeatureS
 	ExperimentalCriticalPodAnnotation:           {Default: false, PreRelease: utilfeature.Alpha},
 	AffinityInAnnotations:                       {Default: false, PreRelease: utilfeature.Alpha},
 	Accelerators:                                {Default: false, PreRelease: utilfeature.Alpha},
+	CpuSet:                                      {Default: false, PreRelease: utilfeature.Alpha},
 	TaintBasedEvictions:                         {Default: false, PreRelease: utilfeature.Alpha},
 
 	// inherited features from generic apiserver, relisted here to get a conflict if it is changed

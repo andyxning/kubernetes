@@ -173,6 +173,8 @@ func (m *kubeGenericRuntimeManager) generateContainerConfig(container *v1.Contai
 		Linux:       m.generateLinuxContainerConfig(container, pod, uid, username),
 	}
 
+	config.Linux.Resources.CpusetMems = opts.CpusetMems
+
 	// set environment variables
 	envs := make([]*runtimeapi.KeyValue, len(opts.Envs))
 	for idx := range opts.Envs {
