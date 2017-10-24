@@ -112,18 +112,7 @@ func (w *worker) run() {
 
 	// If kubelet restarted the probes could be started in rapid succession.
 	// Let the worker wait for a random portion of tickerPeriod before probing.
-	if w.probeType != readiness {
-		time.Sleep(time.Duration(rand.Float64() * float64(probeTickerPeriod)))
-	} else {
-		for {
-			glog.V(3).Infof("Wait4 readiness probe pod: %v, %s", format.Pod(w.pod), w.pod.Status.Phase)
-			time.Sleep(time.Second)
-			if w.pod.Status.Phase == v1.PodRunning {
-				glog.V(3).Infof("Start readiness probe pod: %v", format.Pod(w.pod))
-				break
-			}
-		}
-	}
+	time.Sleep(time.Duration(rand.Float64() * float64(probeTickerPeriod)))
 
 probeLoop:
 	for w.doProbe() {
@@ -144,12 +133,6 @@ func (w *worker) stop() {
 	case w.stopCh <- struct{}{}:
 	default: // Non-blocking.
 	}
-}
-
-// start starts the probe worker. The worker handles update itself from its manager.
-func (w *worker) start() {
-	glog.V(3).Infof("Activate readiness probe pod: %v, %s", format.Pod(w.pod), w.pod.Status.Phase)
-	w.pod.Status.Phase = v1.PodRunning
 }
 
 // doProbe probes the container once and records the result.
