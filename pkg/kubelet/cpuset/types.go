@@ -23,10 +23,16 @@ import "k8s.io/kubernetes/pkg/api/v1"
 type CpuSetManager interface {
 	// Start logically initializes CpuSetManager
 	Start() error
-	// Capacity returns the total number of cpusets on the node.
+	// Capacity returns the total number of numas on the node.
 	CapacityNuma() v1.ResourceList
+	// Capacity returns the total number of cpusets on the node.
+	CapacityCpuSet() v1.ResourceList
 	// AllocateMem attempts to allocate numa for input container.
 	// Returns paths to allocated GPUs and nil on success.
 	// Returns an error on failure.
 	AllocateNuma(*v1.Pod, *v1.Container) ([]string, error)
+	// AllocateCpu attempts to allocate cpu for input container.
+	// Returns paths to allocated GPUs and nil on success.
+	// Returns an error on failure.
+	AllocateCpu(*v1.Pod, *v1.Container) ([]string, error)
 }

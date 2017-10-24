@@ -120,6 +120,17 @@ func (kl *Kubelet) makeNumas(pod *v1.Pod, container *v1.Container) (string, erro
 	return strings.Join(numas, ","), nil
 }
 
+func (kl *Kubelet) makeCpus(pod *v1.Pod, container *v1.Container) (string, error) {
+	if container.Resources.Limits.CpuSet().IsZero() {
+		return "", nil
+	}
+	cpus, err := kl.cpuSetManager.AllocateCpu(pod, container)
+	if err != nil {
+		return "", err
+	}
+	return strings.Join(cpus, ","), nil
+}
+
 // makeMounts determines the mount points for the given container.
 func makeMounts(pod *v1.Pod, podDir string, container *v1.Container, hostName, hostDomain, podIP string, podVolumes kubecontainer.VolumeMap) ([]kubecontainer.Mount, error) {
 	// Kubernetes only mounts on /etc/hosts if :
@@ -333,6 +344,11 @@ func (kl *Kubelet) GenerateRunContainerOptions(pod *v1.Pod, container *v1.Contai
 		return nil, false, err
 	}
 	opts.CpusetMems, err = kl.makeNumas(pod, container)
+	if err != nil {
+		return nil, false, err
+	}
+
+	opts.CpusetCpus, err = kl.makeCpus(pod, container)
 	if err != nil {
 		return nil, false, err
 	}
